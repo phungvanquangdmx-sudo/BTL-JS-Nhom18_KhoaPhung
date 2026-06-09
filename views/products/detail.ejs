@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= product.name %> - TechStore</title>
+  <link rel="icon" type="image/png" href="/images/favicon.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+  <%- include('../partials/navbar') %>
+
+  <div class="max-w-7xl mx-auto px-4 py-12">
+    <!-- Breadcrumb -->
+    <div class="mb-8">
+      <a href="/products" class="text-red-600 hover:underline">Sản Phẩm</a>
+      <span class="mx-2">/</span>
+      <span class="text-gray-600"><%= product.name %></span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+      <!-- Product Image -->
+      <div class="bg-white rounded-lg shadow p-8">
+        <img src="<% if (product.image && product.image !== 'products/default.jpg') { %>/uploads/<%= product.image %><% } else { %>https://via.placeholder.com/400x400?text=<%= product.name.substring(0, 10) %><% } %>" 
+             alt="<%= product.name %>" 
+             class="w-full h-auto rounded-lg">
+      </div>
+
+      <!-- Product Details -->
+      <div class="bg-white rounded-lg shadow p-8">
+        <!-- Category -->
+        <p class="text-sm text-gray-600 mb-2">
+          <i class="fas fa-tag mr-2"></i> <%= product.category_name %>
+        </p>
+
+        <!-- Title -->
+        <h1 class="text-4xl font-bold mb-4"><%= product.name %></h1>
+
+        <!-- Rating -->
+        <div class="flex items-center mb-6">
+          <div class="text-yellow-400">
+            <% for (let i = 0; i < Math.round(product.rating); i++) { %>
+              <i class="fas fa-star"></i>
+            <% } %>
+          </div>
+          <span class="ml-2 text-gray-600">(<%= product.reviews %> đánh giá từ khách hàng)</span>
+        </div>
+
+        <!-- Price Section -->
+        <div class="mb-8 pb-8 border-b">
+          <% const price = parseFloat(product.price); %>
+          <% const discountedPrice = price * (1 - product.discount_percent / 100); %>
+          <% const formatVND = (value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value); %>
+          <div class="flex items-baseline space-x-4">
+            <span class="text-5xl font-bold text-red-600"><%= formatVND(discountedPrice) %></span>
+            <% if (product.discount_percent > 0) { %>
+              <span class="text-2xl text-gray-400 line-through"><%= formatVND(price) %></span>
+              <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full font-bold">
+                Tiết kiệm <%= product.discount_percent %>%
+              </span>
+            <% } %>
+          </div>
+        </div>
+
+        <!-- Stock Status -->
+        <div class="mb-8">
+          <% if (product.stock > 0) { %>
+            <p class="text-green-600 font-bold flex items-center">
+              <i class="fas fa-check-circle mr-2"></i> Còn Hàng (<%= product.stock %> có sẵn)
+            </p>
+          <% } else { %>
+            <p class="text-red-600 font-bold flex items-center">
+              <i class="fas fa-times-circle mr-2"></i> Hết Hàng
+            </p>
+          <% } %>
+        </div>
+
+        <!-- Mô Tả -->
+        <div class="mb-8">
+          <h3 class="text-xl font-bold mb-4">Mô Tả</h3>
+          <p class="text-gray-700 leading-relaxed"><%= product.description %></p>
+        </div>
+
+        <!-- Add to Cart -->
+        <div class="flex flex-col space-y-4">
+          <div class="flex items-center space-x-4">
+            <label class="font-bold">Số Lượng:</label>
+            <input type="number" id="quantity" value="1" min="1" max="<%= product.stock %>" 
+                   class="w-20 px-4 py-2 border border-gray-300 rounded">
+          </div>
+
+          <button class="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 transition font-bold text-lg"
+                  onclick="addToCart('<%= product.id %>', document.getElementById('quantity').value)">
+            <i class="fas fa-shopping-cart mr-2"></i> Thêm vào Giỏ
+          </button>
+
+          <button class="w-full bg-gray-200 text-gray-800 py-3 rounded-lg hover:bg-gray-300 transition font-bold">
+            <i class="fas fa-heart mr-2"></i> Thêm vào Danh Sách Yêu Thích
+          </button>
+        </div>
+
+        <!-- Thông Tin Giao Hàng -->
+        <div class="mt-8 pt-8 border-t space-y-4">
+          <div class="flex items-center space-x-4">
+            <i class="fas fa-truck text-red-600 text-2xl"></i>
+            <div>
+              <p class="font-bold">Giao Hàng Nhanh</p>
+              <p class="text-sm text-gray-600">Miễn phí vận chuyển cho đơn hàng trên $50</p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-4">
+            <i class="fas fa-shield-alt text-red-600 text-2xl"></i>
+            <div>
+              <p class="font-bold">Thanh Toán An Toàn</p>
+              <p class="text-sm text-gray-600">100% giao dịch an toàn và được bảo vệ</p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-4">
+            <i class="fas fa-undo text-red-600 text-2xl"></i>
+            <div>
+              <p class="font-bold">Dễ Dàng Hoàn Trả</p>
+              <p class="text-sm text-gray-600">Bảo hành hoàn trả 30 ngày</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%- include('../partials/footer') %>
+
+  <script>
+    async function addToCart(productId, quantity) {
+      try {
+        const response = await fetch('/cart/add', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            productId: parseInt(productId),
+            quantity: parseInt(quantity)
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          alert('Đã thêm vào giỏ hàng!');
+          location.reload();
+        } else {
+          alert(data.error || 'Error adding to cart');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Error adding to cart: ' + error.message);
+      }
+    }
+  </script>
+</body>
+</html>

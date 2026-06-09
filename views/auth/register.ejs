@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng Ký - TechStore</title>
+  <link rel="icon" type="image/png" href="/images/favicon.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gradient-to-br from-red-600 to-red-800 min-h-screen flex items-center justify-center">
+  
+  <div class="w-full max-w-md">
+    <!-- Card -->
+    <div class="bg-white rounded-lg shadow-lg p-8">
+      <!-- Logo -->
+      <div class="text-center mb-8">
+        <img src="/images/logoStore.png" alt="TechStore Logo" class="h-16 mx-auto mb-2">
+        <h1 class="text-3xl font-bold text-gray-800">TechStore</h1>
+      </div>
+
+      <!-- Form Title -->
+      <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Tạo Tài Khoản</h2>
+
+      <!-- Error Alert -->
+      <% if (messages.error && messages.error.length > 0) { %>
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 flex items-center">
+          <i class="fas fa-exclamation-circle mr-3"></i>
+          <div>
+            <% messages.error.forEach(msg => { %>
+              <p><%= msg %></p>
+            <% }) %>
+          </div>
+        </div>
+      <% } %>
+
+      <!-- Success Alert -->
+      <% if (messages.success && messages.success.length > 0) { %>
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 flex items-center">
+          <i class="fas fa-check-circle mr-3"></i>
+          <div>
+            <% messages.success.forEach(msg => { %>
+              <p><%= msg %></p>
+            <% }) %>
+          </div>
+        </div>
+      <% } %>
+
+      <!-- Registration Form -->
+      <form action="/auth/register" method="POST" class="space-y-4">
+        <!-- Name -->
+        <div>
+          <label class="block text-gray-700 font-bold mb-2">Họ Và Tên</label>
+          <input type="text" 
+                 name="name" 
+                 placeholder="John Doe"
+                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500"
+                 required>
+        </div>
+
+        <!-- Email -->
+        <div>
+          <label class="block text-gray-700 font-bold mb-2">Email</label>
+          <input type="email" 
+                 name="email" 
+                 placeholder="your@email.com"
+                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500"
+                 required>
+        </div>
+
+        <!-- Password -->
+        <div>
+          <label class="block text-gray-700 font-bold mb-2">Mật Khẩu</label>
+          <input type="password" 
+                 name="password" 
+                 placeholder="••••••••"
+                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500"
+                 required>
+          <p class="text-xs text-gray-600 mt-1">Tối thiểu 6 ký tự</p>
+        </div>
+
+        <!-- Confirm Password -->
+        <div>
+          <label class="block text-gray-700 font-bold mb-2">Xác Nhận Mật Khẩu</label>
+          <input type="password" 
+                 name="confirmPassword" 
+                 placeholder="••••••••"
+                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500"
+                 required>
+        </div>
+
+        <!-- Terms -->
+        <div class="flex items-center">
+          <input type="checkbox" id="terms" class="w-4 h-4 text-red-600 rounded" required>
+          <label for="terms" class="ml-2 text-sm text-gray-700">
+            Tôi đồng ý với <a href="#" class="text-red-600 font-bold">Điều Khoản Dịch Vụ</a>
+          </label>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="w-full bg-red-600 text-white py-2 rounded-lg font-bold hover:bg-red-700 transition">
+          Tạo Tài Khoản
+        </button>
+      </form>
+
+      <!-- Login Link -->
+      <div class="text-center mt-6">
+        <p class="text-gray-700">
+          Đã có tài khoản? 
+          <a href="/auth/login" class="text-red-600 font-bold hover:underline">Đăng Nhập Tại Đây</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

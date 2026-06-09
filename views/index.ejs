@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AHKT-TechStore - Premium Smartphones</title>
+  <link rel="icon" type="image/png" href="/images/favicon.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <style>
+    .hero-gradient {
+      background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+    }
+    .product-card {
+      transition: all 0.3s ease;
+    }
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+    .discount-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #ef4444;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-weight: bold;
+      font-size: 12px;
+    }
+    .star-rating {
+      color: #fbbf24;
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <%- include('./partials/navbar') %>
+
+  <!-- Flash Messages -->
+  <% if (messages && messages.success && messages.success.length > 0) { %>
+    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded m-4">
+      <% messages.success.forEach(msg => { %>
+        <p><%= msg %></p>
+      <% }) %>
+    </div>
+  <% } %>
+
+  <% if (messages && messages.error && messages.error.length > 0) { %>
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded m-4">
+      <% messages.error.forEach(msg => { %>
+        <p><%= msg %></p>
+      <% }) %>
+    </div>
+  <% } %>
+
+  <!-- Hero Carousel Banner -->
+  <div class="hero-gradient text-white py-16">
+    <div class="max-w-7xl mx-auto px-4">
+      <!-- Welcome Message -->
+      <div class="text-center mb-12">
+        <h1 class="text-5xl font-bold mb-4">Chào Mừng Đến Với AHKT-TechStore</h1>
+        <p class="text-xl mb-8">Nơi bạn sẽ tìm thấy những chiếc điện thoại tốt nhất</p>
+      </div>
+
+      <!-- Product Carousel -->
+      <div class="relative">
+        <div id="carousel">
+          <!-- Carousel Items -->
+          <% if (featuredProducts && featuredProducts.length > 0) { %>
+            <% featuredProducts.forEach((product, index) => { %>
+              <div class="carousel-item <% if (index === 0) { %>block<% } else { %>hidden<% } %>" data-slide="<%= index %>">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center min-h-96">
+                  <!-- Left Content -->
+                  <div class="flex flex-col justify-center space-y-6">
+                    <!-- Category Badge -->
+                    <div>
+                      <% if (product.category_name) { %>
+                        <span class="inline-block bg-white bg-opacity-20 backdrop-blur text-white px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-widest border border-white border-opacity-30">
+                          <%= product.category_name %>
+                        </span>
+                      <% } %>
+                    </div>
+                    
+                    <!-- Product Name -->
+                    <div>
+                      <h2 class="text-5xl lg:text-6xl font-bold text-white leading-tight mb-2"><%= product.name %></h2>
+                      <div class="h-1 w-24 bg-yellow-300 rounded-full"></div>
+                    </div>
+                    
+                    <!-- Price -->
+                    <div class="pt-2">
+                      <p class="text-gray-200 text-sm uppercase tracking-widest mb-2">Bắt đầu từ</p>
+                      <p class="text-4xl font-bold text-yellow-300">
+                        <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price) %>
+                      </p>
+                    </div>
+                    
+                    <!-- Call to Action -->
+                    <div class="pt-4">
+                      <a href="/products/<%= product.id %>" class="inline-block bg-white text-red-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition transform hover:scale-105">
+                        Khám Phá Ngay →
+                      </a>
+                    </div>
+                    
+                    <!-- Key Features / Description -->
+                    <div class="pt-6 border-t border-white border-opacity-20">
+                      <p class="text-gray-100 text-base leading-relaxed max-w-sm">
+                        <%= product.description %>
+                      </p>
+                    </div>
+                  </div>
+
+                  <!-- Right - Product Image -->
+                  <div class="flex items-center justify-center lg:justify-end">
+                    <div class="relative">
+                      <!-- Glow Effect Background -->
+                      <div class="absolute -inset-8 bg-white bg-opacity-5 rounded-3xl blur-3xl"></div>
+                      
+                      <!-- Image Container -->
+                      <div class="relative bg-white bg-opacity-10 backdrop-blur rounded-3xl p-8 shadow-2xl border border-white border-opacity-20">
+                        <img src="<% if (product.image && product.image !== 'products/default.jpg') { %>/uploads/<%= product.image %><% } else { %>https://via.placeholder.com/500x500?text=<%= product.name.substring(0, 10) %><% } %>" 
+                             alt="<%= product.name %>" 
+                             class="w-64 lg:w-80 h-auto object-cover rounded-2xl shadow-lg">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <% }) %>
+          <% } %>
+        </div>
+
+        <!-- Navigation Arrows -->
+        <% if (featuredProducts && featuredProducts.length > 1) { %>
+          <button onclick="previousSlide()" class="absolute left-0 top-1/2 -translate-y-1/2 bg-black bg-opacity-30 hover:bg-opacity-50 text-white w-12 h-12 flex items-center justify-center rounded-full transition shadow-lg z-10">
+            <i class="fas fa-chevron-left text-xl"></i>
+          </button>
+          <button onclick="nextSlide()" class="absolute right-0 top-1/2 -translate-y-1/2 bg-black bg-opacity-30 hover:bg-opacity-50 text-white w-12 h-12 flex items-center justify-center rounded-full transition shadow-lg z-10">
+            <i class="fas fa-chevron-right text-xl"></i>
+          </button>
+
+          <!-- Carousel Dots -->
+          <div class="flex justify-center gap-3 mt-8">
+            <% for (let i = 0; i < Math.min(featuredProducts.length, 5); i++) { %>
+              <button onclick="goToSlide('<%= i %>')" class="carousel-dot <% if (i === 0) { %>bg-white<% } else { %>bg-white bg-opacity-50<% } %> w-3 h-3 rounded-full transition hover:bg-opacity-100" data-dot="<%= i %>"></button>
+            <% } %>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Carousel Script -->
+  <script>
+    let currentSlide = 0;
+    const items = document.querySelectorAll('.carousel-item');
+    const dots = document.querySelectorAll('.carousel-dot');
+
+    function showSlide(n) {
+      items.forEach(item => item.classList.add('hidden'));
+      dots.forEach(dot => {
+        dot.classList.remove('bg-white');
+        dot.classList.add('bg-opacity-50');
+      });
+      
+      if (items[n]) {
+        items[n].classList.remove('hidden');
+      }
+      if (dots[n]) {
+        dots[n].classList.remove('bg-opacity-50');
+        dots[n].classList.add('bg-white');
+      }
+    }
+
+    function nextSlide() {
+      currentSlide = (currentSlide + 1) % items.length;
+      showSlide(currentSlide);
+    }
+
+    function previousSlide() {
+      currentSlide = (currentSlide - 1 + items.length) % items.length;
+      showSlide(currentSlide);
+    }
+
+    function goToSlide(n) {
+      currentSlide = parseInt(n);
+      showSlide(currentSlide);
+    }
+
+    // Auto-advance carousel every 5 seconds
+    setInterval(nextSlide, 5000);
+  </script>
+
+  <!-- Featured Products -->
+  <div class="max-w-7xl mx-auto px-4 py-16">
+    <h2 class="text-3xl font-bold mb-8">Sản Phẩm Nổi Bật</h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <% if (featuredProducts && featuredProducts.length > 0) { %>
+        <% featuredProducts.forEach(product => { %>
+          <div class="product-card bg-white rounded-lg overflow-hidden shadow">
+            <!-- Product Image -->
+            <div class="relative h-70 bg-gray-200 overflow-hidden">
+              <img src="<% if (product.image && product.image !== 'products/default.jpg') { %>/uploads/<%= product.image %><% } else { %>https://via.placeholder.com/300x300?text=<%= product.name.substring(0, 10) %><% } %>" 
+                   alt="<%= product.name %>" 
+                   class="w-full h-full object-cover">
+              <% if (product.discount_percent > 0) { %>
+                <div class="discount-badge">-<%= product.discount_percent %>%</div>
+              <% } %>
+            </div>
+
+            <!-- Product Info -->
+            <div class="p-4">
+              <h3 class="font-bold text-lg mb-2 line-clamp-2"><%= product.name %></h3>
+              
+              <!-- Rating -->
+              <div class="flex items-center mb-2">
+                <div class="star-rating">
+                  <% for (let i = 0; i < Math.round(product.rating); i++) { %>
+                    <i class="fas fa-star"></i>
+                  <% } %>
+                </div>
+                <span class="text-sm text-gray-600 ml-2">(<%= product.reviews %> đánh giá)</span>
+              </div>
+
+              <!-- Price -->
+              <div class="mb-4">
+                <% const price = parseFloat(product.price); %>
+                <% const discountedPrice = price * (1 - product.discount_percent / 100); %>
+                <% const formatVND = (value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value); %>
+                <% if (product.discount_percent > 0) { %>
+                  <span class="text-gray-400 line-through mr-2"><%= formatVND(price) %></span>
+                <% } %>
+                <span class="text-2xl font-bold text-red-600"><%= formatVND(discountedPrice) %></span>
+              </div>
+
+              <!-- Add to Cart Button -->
+              <button class="w-full bg-red-600 text-white py-2 rounded hover:bg-red-700 transition"
+                      onclick="addToCart('<%= product.id %>', 1)">
+                <i class="fas fa-shopping-cart mr-2"></i> Thêm Vào Giỏ
+              </button>
+
+              <!-- View Details Button -->
+              <a href="/products/<%= product.id %>" class="block w-full mt-2 text-center bg-gray-200 text-gray-800 py-2 rounded hover:bg-gray-300 transition">
+                Xem Chi Tiết
+              </a>
+            </div>
+          </div>
+        <% }) %>
+      <% } else { %>
+        <p class="col-span-4 text-center text-gray-600">No featured products available</p>
+      <% } %>
+    </div>
+
+    <!-- View All Products -->
+    <div class="text-center mt-12">
+      <a href="/products" class="inline-block bg-red-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-red-700">
+        Xem Tất Cả Sản Phẩm
+      </a>
+    </div>
+  </div>
+
+  <!-- Flash Sale Carousel Section -->
+  <div class="bg-gradient-to-r from-red-600 to-red-700 py-16 mb-16">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="mb-12">
+        <h2 class="text-4xl font-bold text-white mb-2">🔥 FLASH SALE HÔM NAY 🔥</h2>
+        <p class="text-red-100">Ưu đãi có thời hạn - Đừng bỏ lỡ!</p>
+      </div>
+
+      <!-- Sale Products Carousel -->
+      <div class="relative">
+        <div id="saleCarousel" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <% 
+            const saleProducts = allProducts ? allProducts.filter(p => p.discount_percent > 0) : [];
+            if (saleProducts.length > 0) {
+          %>
+            <% saleProducts.forEach((product, index) => { %>
+              <div class="sale-carousel-item <% if (index === 0 || index === 1) { %>flex<% } else { %>hidden<% } %> flex-col md:flex-row bg-white rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition transform hover:scale-105 duration-300"
+                   data-slide="<%= index %>">
+                
+                <!-- Product Image -->
+                <div class="md:w-2/5 bg-gray-100 flex items-center justify-center p-6 min-h-64">
+                  <img src="<% if (product.image && product.image !== 'products/default.jpg') { %>/uploads/<%= product.image %><% } else { %>https://via.placeholder.com/300x300?text=<%= product.name.substring(0, 10) %><% } %>" 
+                       alt="<%= product.name %>" 
+                       class="max-h-64 max-w-full object-contain">
+                </div>
+
+                <!-- Product Info -->
+                <div class="md:w-3/5 p-8 flex flex-col justify-center">
+                  <h3 class="text-2xl font-bold text-gray-800 mb-3"><%= product.name %></h3>
+                  
+                  <!-- Discount Badge -->
+                  <div class="mb-4">
+                    <span class="inline-block bg-gradient-to-r from-red-600 to-red-700 text-white px-4 py-2 rounded-full font-bold text-lg">
+                      Trả góp 0% - <%= product.discount_percent %>% OFF
+                    </span>
+                  </div>
+
+                  <!-- Product Description -->
+                  <div class="mb-6">
+                    <p class="text-gray-700 text-base leading-relaxed"><%= product.description.substring(0, 150) %><% if (product.description.length > 150) { %>...<% } %></p>
+                  </div>
+
+                  <!-- Price Section -->
+                  <div class="mb-6">
+                    <% const salePrice = parseFloat(product.price); %>
+                    <% const salePriceAfter = salePrice * (1 - product.discount_percent / 100); %>
+                    <% const formatSaleVND = (value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value); %>
+                    <div class="flex items-center gap-3 mb-2">
+                      <span class="text-gray-400 line-through text-lg"><%= formatSaleVND(salePrice) %></span>
+                      <span class="text-red-600 font-bold text-lg">Đang Giảm <%= formatSaleVND(salePrice - salePriceAfter) %></span>
+                    </div>
+                    <span class="text-4xl font-bold text-red-600"><%= formatSaleVND(salePriceAfter) %></span>
+                  </div>
+
+                  <!-- Rating -->
+                  <div class="flex items-center gap-2 mb-6">
+                    <div class="text-yellow-400">
+                      <% for (let i = 0; i < 5; i++) { %>
+                        <i class="fas fa-star <%= i < Math.round(product.rating || 4) ? '' : 'opacity-30' %>"></i>
+                      <% } %>
+                    </div>
+                    <span class="text-gray-600 text-sm">(0 đánh giá)</span>
+                  </div>
+
+                  <!-- Action Button -->
+                  <button onclick="addToCart('<%= product.id %>', 1)" 
+                          class="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-3 rounded-lg transition transform hover:scale-105">
+                    <i class="fas fa-shopping-cart mr-2"></i> Thêm vào giỏ hàng
+                  </button>
+                </div>
+              </div>
+            <% }) %>
+          <% } %>
+        </div>
+
+        <!-- Navigation Arrows -->
+        <% if (saleProducts.length > 2) { %>
+          <button onclick="prevSaleSlide()" class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-6 md:-translate-x-12 bg-red-600 hover:bg-red-700 text-white w-14 h-14 flex items-center justify-center rounded-full transition shadow-xl z-10">
+            <i class="fas fa-chevron-left text-2xl"></i>
+          </button>
+          <button onclick="nextSaleSlide()" class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 md:translate-x-12 bg-red-600 hover:bg-red-700 text-white w-14 h-14 flex items-center justify-center rounded-full transition shadow-xl z-10">
+            <i class="fas fa-chevron-right text-2xl"></i>
+          </button>
+
+          <!-- Carousel Dots -->
+          <div class="flex justify-center gap-3 mt-8">
+            <% for (let i = 0; i < Math.ceil(saleProducts.length / 2); i++) { %>
+              <button onclick="goToSaleSlide('<%= i %>')" class="sale-carousel-dot <% if (i === 0) { %>bg-white<% } else { %>bg-white bg-opacity-50<% } %> w-3 h-3 rounded-full transition hover:bg-opacity-100" data-dot="<%= i %>"></button>
+            <% } %>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sale Carousel Script -->
+  <script>
+    let currentSaleSlide = 0;
+    const saleItems = document.querySelectorAll('.sale-carousel-item');
+    const saleDots = document.querySelectorAll('.sale-carousel-dot');
+    const itemsPerPage = 2;
+
+    function showSaleSlide(n) {
+      // Hide all items
+      saleItems.forEach(item => item.classList.add('hidden'));
+      saleItems.forEach(item => item.classList.remove('flex'));
+      
+      // Remove active dot styling
+      saleDots.forEach(dot => {
+        dot.classList.remove('bg-white');
+        dot.classList.add('bg-opacity-50');
+      });
+      
+      // Show current and next item
+      if (saleItems[n * itemsPerPage]) {
+        saleItems[n * itemsPerPage].classList.remove('hidden');
+        saleItems[n * itemsPerPage].classList.add('flex');
+      }
+      if (saleItems[n * itemsPerPage + 1]) {
+        saleItems[n * itemsPerPage + 1].classList.remove('hidden');
+        saleItems[n * itemsPerPage + 1].classList.add('flex');
+      }
+      
+      // Highlight active dot
+      if (saleDots[n]) {
+        saleDots[n].classList.remove('bg-opacity-50');
+        saleDots[n].classList.add('bg-white');
+      }
+    }
+
+    function nextSaleSlide() {
+      const maxSlides = Math.ceil(saleItems.length / itemsPerPage);
+      currentSaleSlide = (currentSaleSlide + 1) % maxSlides;
+      showSaleSlide(currentSaleSlide);
+    }
+
+    function prevSaleSlide() {
+      const maxSlides = Math.ceil(saleItems.length / itemsPerPage);
+      currentSaleSlide = (currentSaleSlide - 1 + maxSlides) % maxSlides;
+      showSaleSlide(currentSaleSlide);
+    }
+
+    function goToSaleSlide(n) {
+      currentSaleSlide = parseInt(n);
+      showSaleSlide(currentSaleSlide);
+    }
+
+    // Initialize the first slide
+    showSaleSlide(0);
+  </script>
+
+  <!-- Categories Section -->
+  <div class="bg-white py-16">
+    <div class="max-w-7xl mx-auto px-4">
+      <h2 class="text-3xl font-bold mb-8">Danh Mục Sản Phẩm</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <% if (categories && categories.length > 0) { %>
+          <% categories.forEach(category => { %>
+            <a href="/products/category/<%= category.id %>" class="bg-gray-100 p-6 rounded-lg text-center hover:shadow-lg transition">
+              <div class="text-4xl mb-3">
+                <i class="fas fa-mobile-alt text-red-600"></i>
+              </div>
+              <h3 class="font-bold"><%= category.name %></h3>
+            </a>
+          <% }) %>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <%- include('./partials/footer') %>
+
+  <script src="/js/main.js"></script>
+
+  <script>
+    async function addToCart(productId, quantity = 1) {
+      try {
+        const response = await axios.post('/cart/add', {
+          productId: productId,
+          quantity: quantity
+        });
+        if (response.data.success) {
+          alert('Đã thêm vào giỏ hàng!');
+          location.reload();
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+  </script>
+</body>
+</html>

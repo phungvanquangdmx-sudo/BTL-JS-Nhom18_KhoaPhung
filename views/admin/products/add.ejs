@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thêm Sản Phẩm - TechStore</title>
+  <link rel="icon" type="image/png" href="/images/favicon.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+  <%- include('../../partials/navbar') %>
+
+  <div class="max-w-3xl mx-auto px-4 py-12">
+    <h1 class="text-4xl font-bold mb-8">Thêm Sản Phẩm Mới</h1>
+
+    <div class="bg-white rounded-lg shadow p-8">
+      <form action="/admin/products/add" method="POST" enctype="multipart/form-data" class="space-y-6">
+        <!-- Name -->
+        <div>
+          <label class="block font-bold mb-2">Tên Sản Phẩm</label>
+          <input type="text" 
+                 name="name" 
+                 placeholder="T1 TrumpPhone"
+                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500"
+                 required>
+        </div>
+
+        <!-- Description -->
+        <div>
+          <label class="block font-bold mb-2">Mô Tả</label>
+          <textarea name="description" 
+                    placeholder="Mô tả sản phẩm..."
+                    rows="5"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500"
+                    required></textarea>
+        </div>
+
+        <!-- Price & Discount -->
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block font-bold mb-2">Giá</label>
+            <input type="number" 
+                   name="price" 
+                   step="0.01"
+                   placeholder="0.00"
+                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500"
+                   required>
+          </div>
+
+          <div>
+            <label class="block font-bold mb-2">Giảm Giá %</label>
+            <input type="number" 
+                   name="discount_percent" 
+                   min="0" 
+                   max="100" 
+                   placeholder="0"
+                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500">
+          </div>
+        </div>
+
+        <!-- Category & Stock -->
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block font-bold mb-2">Danh Mục</label>
+            <select name="category_id" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500" required>
+              <option value="">Chọn Danh Mục</option>
+              <% if (categories && categories.length > 0) { %>
+                <% categories.forEach(cat => { %>
+                  <option value="<%= cat.id %>"><%= cat.name %></option>
+                <% }) %>
+              <% } %>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-bold mb-2">Kho Hàng</label>
+            <input type="number" 
+                   name="stock" 
+                   min="0" 
+                   placeholder="0"
+                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500">
+          </div>
+        </div>
+
+        <!-- Image -->
+        <div>
+          <label class="block font-bold mb-2">Hình Ảnh Sản Phẩm</label>
+          <input type="file" 
+                 name="image" 
+                 accept="image/*"
+                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500">
+        </div>
+
+        <!-- Featured -->
+        <div class="flex items-center">
+          <input type="checkbox" 
+                 id="featured" 
+                 name="featured" 
+                 class="w-4 h-4 text-red-600 rounded">
+          <label for="featured" class="ml-2 font-bold">Mark as Featured</label>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="flex space-x-4">
+          <button type="submit" class="flex-1 bg-red-600 text-white py-3 rounded-lg font-bold hover:bg-red-700">
+            Add Product
+          </button>
+          <a href="/admin/products" class="flex-1 bg-gray-200 text-gray-800 py-3 rounded-lg font-bold text-center hover:bg-gray-300">
+            Cancel
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

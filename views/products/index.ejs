@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sản Phẩm - TechStore</title>
+  <link rel="icon" type="image/png" href="/images/favicon.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <style>
+    .product-card {
+      transition: all 0.3s ease;
+    }
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+    .discount-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #ef4444;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-weight: bold;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <%- include('../partials/navbar') %>
+
+  <!-- Tiêu đề Trang -->
+  <div class="bg-white shadow py-8">
+    <div class="max-w-7xl mx-auto px-4">
+      <h1 class="text-3xl font-bold">
+        <% if (searchQuery) { %>
+          Kết quả tìm kiếm cho "<%= searchQuery %>"
+        <% } else if (selectedCategory) { %>
+          <%= selectedCategory.name %>
+        <% } else { %>
+          Tất Cả Sản Phẩm
+        <% } %>
+      </h1>
+      <p class="text-gray-600 mt-2">
+        Hiển thị <strong><%= products.length %></strong> trong <strong><%= totalProducts %></strong> sản phẩm
+      </p>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 py-12">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <!-- Sidebar - Filters -->
+      <div class="lg:col-span-1">
+        <div class="bg-white rounded-lg shadow p-6">
+          <h3 class="font-bold text-lg mb-4">Danh Mục</h3>
+          <div class="space-y-2">
+            <a href="/products" class="block px-4 py-2 rounded hover:bg-red-100 font-medium">
+              Tất Cả Danh Mục
+            </a>
+            <% if (categories && categories.length > 0) { %>
+              <% categories.forEach(cat => { %>
+                <a href="/products/category/<%= cat.id %>" 
+                   class="block px-4 py-2 rounded hover:bg-red-100 <%= selectedCategory && selectedCategory.id === cat.id ? 'bg-red-100 font-bold' : '' %>">
+                  <%= cat.name %>
+                </a>
+              <% }) %>
+            <% } %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Products Grid -->
+      <div class="lg:col-span-3">
+        <% if (products && products.length > 0) { %>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <% products.forEach(product => { %>
+              <div class="product-card bg-white rounded-lg overflow-hidden shadow">
+                <!-- Product Image -->
+                <div class="relative h-70 bg-gray-200 overflow-hidden">
+                  <img src="<% if (product.image && product.image !== 'products/default.jpg') { %>/uploads/<%= product.image %><% } else { %>https://via.placeholder.com/300x300?text=<%= product.name.substring(0, 10) %><% } %>" 
+                       alt="<%= product.name %>" 
+                       class="w-full h-full object-cover">
+                  <% if (product.discount_percent > 0) { %>
+                    <div class="discount-badge">-<%= product.discount_percent %>%</div>
+                  <% } %>
+                </div>
+
+                <!-- Product Info -->
+                <div class="p-4">
+                  <p class="text-sm text-gray-600"><%= product.category_name %></p>
+                  <h3 class="font-bold text-lg mb-2 line-clamp-2"><%= product.name %></h3>
+                  
+                  <!-- Price -->
+                  <div class="mb-4">
+                    <% const price = parseFloat(product.price); %>
+                    <% const discountedPrice = price * (1 - product.discount_percent / 100); %>
+                    <% const formatVND = (value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value); %>
+                    <% if (product.discount_percent > 0) { %>
+                      <span class="text-gray-400 line-through mr-2"><%= formatVND(price) %></span>
+                    <% } %>
+                    <span class="text-2xl font-bold text-red-600"><%= formatVND(discountedPrice) %></span>
+                  </div>
+
+                  <!-- Buttons -->
+                  <button class="w-full bg-red-600 text-white py-2 rounded hover:bg-red-700 transition mb-2"
+                          onclick="addToCart('<%= product.id %>', 1)">
+                    <i class="fas fa-shopping-cart mr-2"></i> Thêm vào Giỏ
+                  </button>
+
+                  <a href="/products/<%= product.id %>" class="block w-full text-center bg-gray-200 text-gray-800 py-2 rounded hover:bg-gray-300 transition">
+                    Xem Chi Tiết
+                  </a>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+
+          <!-- Pagination -->
+          <% if (totalPages > 1) { %>
+            <div class="flex justify-center space-x-2 mt-8">
+              <% if (currentPage > 1) { %>
+                <a href="?page=<%= currentPage - 1 %>" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+                  Trước
+                </a>
+              <% } %>
+
+              <% for (let i = 1; i <= totalPages; i++) { %>
+                <a href="?page=<%= i %>" 
+                   class="px-4 py-2 rounded <%= i === currentPage ? 'bg-red-600 text-white' : 'bg-white border border-gray-300 hover:bg-gray-100' %>">
+                  <%= i %>
+                </a>
+              <% } %>
+
+              <% if (currentPage < totalPages) { %>
+                <a href="?page=<%= currentPage + 1 %>" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+                  Tiếp Theo
+                </a>
+              <% } %>
+            </div>
+          <% } %>
+        <% } else { %>
+          <div class="text-center py-12">
+            <i class="fas fa-search text-6xl text-gray-300 mb-4"></i>
+            <p class="text-xl text-gray-600">Không tìm thấy sản phẩm</p>
+            <a href="/products" class="inline-block mt-4 bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700">
+              Xem Tất Cả Sản Phẩm
+            </a>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <%- include('../partials/footer') %>
+
+  <script>
+    async function addToCart(productId, quantity = 1) {
+      try {
+        const response = await axios.post('/cart/add', {
+          productId: productId,
+          quantity: quantity
+        });
+        if (response.data.success) {
+          alert('Đã thêm vào giỏ hàng!');
+          location.reload();
+        }
+      } catch (error) {
+        console.error('Error:', error);
+  
+      }
+    }
+  </script>
+</body>
+</html>

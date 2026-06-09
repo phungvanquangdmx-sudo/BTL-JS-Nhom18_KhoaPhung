@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trang Không Tìm Thấy - TechStore</title>
+  <link rel="icon" type="image/png" href="/images/favicon.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+  <%- include('./partials/navbar') %>
+
+  <div class="min-h-screen flex items-center justify-center px-4">
+    <div class="text-center">
+      <h1 class="text-8xl font-bold text-red-600 mb-4">404</h1>
+      <h2 class="text-4xl font-bold text-gray-800 mb-4">Trang Không Tìm Thấy</h2>
+      <p class="text-xl text-gray-600 mb-8">Xin lỗi, chúng tôi không thể tìm thấy trang bạn đang tìm kiếm.</p>
+      
+      <div class="space-x-4">
+        <a href="/" class="inline-block bg-red-600 text-white px-8 py-3 rounded-lg hover:bg-red-700">
+          Về Trang Chủ
+        </a>
+        <a href="/products" class="inline-block bg-gray-200 text-gray-800 px-8 py-3 rounded-lg hover:bg-gray-300">
+          Mua Sắm Sản Phẩm
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <%- include('./partials/footer') %>
+</body>
+</html>
