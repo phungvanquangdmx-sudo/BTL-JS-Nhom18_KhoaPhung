@@ -21,7 +21,6 @@ class CartController {
           discountedPrice: discountedPrice
         };
       }));
-
       res.render('cart/index', {
         cartItems: cartItems,
         total: total,
